@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cost Expenses Tracker</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+	<div class="container mt-5">
+		<h1>Cost Expenses Tracker</h1>
+
+		<p>Fill out the following form:</p>
+		<div class="form-group">
+			<label for="spent_on">Spent on:</label>
+			<input type="text" id="spent_on" name="spent_on" class="form-control">
+		</div>
+
+		<div class="form-group">
+			<label for="description">Description:</label>
+			<input type="text" id="description" name="description" class="form-control">
+		</div>
+
+		<div class="form-group">
+			<label for="cost">Cost:</label>
+			<input type="number" id="cost" name="cost" class="form-control">
+		</div>
+
+		
+
+		<button onclick="storeExpense()" class="btn btn-primary">Submit</button>
+
+		<div id="expenseList" class="mt-5"></div>
+	</div>
+
+	<script>
+		function storeExpense() {
+			
+			
+			var spentOn = document.getElementById("spent_on").value;
+			var description = document.getElementById("description").value;
+			var cost = document.getElementById("cost").value;
+
+			var expense = {description: description, cost: cost, spent_on: spentOn};
+			localStorage.setItem(description, JSON.stringify(expense));
+
+			displayExpenses();
+		}
+
+		function displayExpenses() {
+			var expenseList = document.getElementById("expenseList");
+			expenseList.innerHTML = "";
+
+			for (var i = 0; i < localStorage.length; i++) {
+				var key = localStorage.key(i);
+				var expense = JSON.parse(localStorage.getItem(key));
+
+				expenseList.innerHTML += '<div class="card mt-3"><div class="card-body"><h5 class="card-title">' + expense.description + '</h5><p class="card-text">Cost: ' + expense.cost + '<br>Spent On: ' + expense.spent_on + '</p><button onclick=\'editExpense("' + key + '")\' class="btn btn-primary">Edit</button><button onclick=\'deleteExpense("' + key + '")\' class="btn btn-danger ml-2">Delete</button></div></div>';
+			}
+		}
+
+		function editExpense(key) {
+    var expense = JSON.parse(localStorage.getItem(key));
+    document.getElementById("description").value = expense.description;
+    document.getElementById("cost").value = expense.cost;
+    document.getElementById("spent_on").value = expense.spent_on;
+    localStorage.removeItem(key);
+    document.getElementById("submitBtn").innerHTML = "Update";
+    document.getElementById("submitBtn").removeEventListener("click", storeExpense);
+    document.getElementById("submitBtn").addEventListener("click", function () {
+        updateExpense(key);
+    });
+}
+
+function updateExpense(key) {
+    var description = document.getElementById("description").value;
+    var cost = document.getElementById("cost").value;
+    var spentOn = document.getElementById("spent_on").value;
+
+    var expense = {description: description, cost: cost, spent_on: spentOn};
+    localStorage.setItem(description, JSON.stringify(expense));
+
+    document.getElementById("description").value = "";
+    document.getElementById("cost").value = "";
+    document.getElementById("spent_on").value = "";
+    document.getElementById("submitBtn").innerHTML = "Submit";
+    document.getElementById("submitBtn").removeEventListener("click", updateExpense);
+    document.getElementById("submitBtn").addEventListener("click", storeExpense);
+
+    displayExpenses();
+}
+
+		function deleteExpense(key) {
+			localStorage.removeItem(key);
+			displayExpenses();
+		}
+
+		displayExpenses();
+	</script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
